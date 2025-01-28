@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spray Rate and Chippings Spread Rate Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 15px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Spray Rate and Chippings Spread Rate Calculator</h2>
+
+        <!-- Spray Rate Calculator -->
+        <h3>Spray Rate Calculator</h3>
+        <form id="sprayRateForm">
+            <label for="totalWeight">Total Weight (Bitumen + Pan) in grams:</label>
+            <input type="number" id="totalWeight" placeholder="Enter total weight" required>
+
+            <label for="weightOfPan">Weight of Pan in grams:</label>
+            <input type="number" id="weightOfPan" placeholder="Enter weight of pan" required>
+
+            <label for="specificGravity">Specific Gravity of Bitumen:</label>
+            <input type="number" step="0.01" id="specificGravity" placeholder="Enter specific gravity" required>
+
+            <label for="length">Length of Pan (meters):</label>
+            <input type="number" step="0.01" id="length" placeholder="Enter length of pan" required>
+
+            <label for="width">Width of Pan (meters):</label>
+            <input type="number" step="0.01" id="width" placeholder="Enter width of pan" required>
+
+            <button type="button" onclick="calculateSprayRate()">Calculate Spray Rate</button>
+        </form>
+
+        <h3 id="sprayRateResult"></h3>
+
+        <hr>
+
+        <!-- Chippings Spread Rate Calculator -->
+        <h3>Chippings Spread Rate Calculator</h3>
+        <form id="spreadRateForm">
+            <label for="bulkDensity">Bulk Density of Chippings (kg/m³):</label>
+            <input type="number" id="bulkDensity" placeholder="Enter bulk density" step="any" required>
+
+            <label for="weightWithAggregate">Weight of Aggregate + Pan (kg):</label>
+            <input type="number" id="weightWithAggregate" placeholder="Enter weight with aggregate and pan" step="any" required>
+
+            <label for="emptyPanWeight">Weight of Empty Pan (kg):</label>
+            <input type="number" id="emptyPanWeight" placeholder="Enter empty pan weight" step="any" required>
+
+            <label for="lengthOfPan">Length of Pan (m):</label>
+            <input type="number" id="lengthOfPan" placeholder="Enter length of pan" step="any" required>
+
+            <label for="widthOfPan">Width of Pan (m):</label>
+            <input type="number" id="widthOfPan" placeholder="Enter width of pan" step="any" required>
+
+            <button type="button" onclick="calculateSpreadRate()">Calculate Spread Rate</button>
+        </form>
+
+        <div id="result" class="result" style="display: none;">
+            <p><strong>Results:</strong></p>
+            <p>Spread Rate: <span id="spreadRateKgM2"></span> kg/m²</p>
+            <p>Spread Rate: <span id="spreadRateM2M3"></span> m²/m³</p>
+        </div>
+    </div>
+
+    <script>
+        // Spray Rate Calculator
+        function calculateSprayRate() {
+            // Get input values
+            const totalWeight = parseFloat(document.getElementById('totalWeight').value); // (weight of bitumen + pan) in grams
+            const weightOfPan = parseFloat(document.getElementById('weightOfPan').value); // in grams
+            const specificGravity = parseFloat(document.getElementById('specificGravity').value);
+            const length = parseFloat(document.getElementById('length').value); // in meters
+            const width = parseFloat(document.getElementById('width').value); // in meters
+
+            // Validate inputs
+            if (isNaN(totalWeight) || isNaN(weightOfPan) || isNaN(specificGravity) || isNaN(length) || isNaN(width)) {
+                alert('Please enter valid numerical values for all fields.');
+                return;
+            }
+
+            // Calculate weight of bitumen (in grams)
+            const weightOfBitumen = totalWeight - weightOfPan;
+
+            // Convert weight of bitumen to kilograms
+            const bitumenWeight = weightOfBitumen / 1000; // kg
+
+            // Calculate the area of the pan (in square meters)
+            const areaOfPan = length * width;
+
+            // Calculate the spray rate
+            const sprayRate = (bitumenWeight / (specificGravity * areaOfPan));
+
+            // Display the result
+            document.getElementById('sprayRateResult').innerText = `Spray Rate: ${sprayRate.toFixed(4)} kg/m²`;
+        }
+
+        // Chippings Spread Rate Calculator
+        function calculateSpreadRate() {
+            // Get input values
+            const bulkDensity = parseFloat(document.getElementById('bulkDensity').value);
+            const weightWithAggregate = parseFloat(document.getElementById('weightWithAggregate').value);
+            const emptyPanWeight = parseFloat(document.getElementById('emptyPanWeight').value);
+            const lengthOfPan = parseFloat(document.getElementById('lengthOfPan').value);
+            const widthOfPan = parseFloat(document.getElementById('widthOfPan').value);
+
+            // Validate inputs
+            if (isNaN(bulkDensity) || isNaN(weightWithAggregate) || isNaN(emptyPanWeight) || isNaN(lengthOfPan) || isNaN(widthOfPan)) {
+                alert('Please enter valid numerical values for all fields.');
+                return;
+            }
+
+            // Calculate weight of aggregate
+            const weightOfAggregate = weightWithAggregate - emptyPanWeight;
+
+            // Calculate area of the pan
+            const areaOfPan = lengthOfPan * widthOfPan;
+
+            // Calculate spread rate in kg/m²
+            const spreadRateKgM2 = ((bulkDensity / weightOfAggregate) * areaOfPan) * 1000;
+
+            // Calculate spread rate in m²/m³
+            const spreadRateM2M3 = 1 / (bulkDensity / spreadRateKgM2);
+
+            // Display results
+            document.getElementById('spreadRateKgM2').innerText = spreadRateKgM2.toFixed(2);
+            document.getElementById('spreadRateM2M3').innerText = spreadRateM2M3.toFixed(2);
+            document.getElementById('result').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
